@@ -25,6 +25,9 @@ public:
 
     void initialize();
 
+    void home();
+    void turn(int32_t deg);
+
 private:
     Palm* m_palm;
     Wrist* m_wrist;

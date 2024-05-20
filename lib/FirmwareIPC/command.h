@@ -6,9 +6,10 @@
 
 enum Action {
     None,
+    Home,
+    Clawffset,
+    Turn,
     Solve,
-    AddToSolveBuffer,
-    ClearSolveBuffer
 };
 
 class Command {
@@ -23,7 +24,7 @@ private:
     std::map<std::string, Action> ActionMap{
         { "",          Action::None},
         { "Home",      Action::Home },
-        { "Clawffset", Action::Clawffset }
+        { "Clawffset", Action::Clawffset },
         { "Turn",      Action::Turn },
         { "Solve",     Action::Solve },
     };

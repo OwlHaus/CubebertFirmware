@@ -8,6 +8,10 @@ enum State {
     Ready
 };
 
+// Forward Class desclarations
+class Claw;
+
+// Actual class
 class StateMachine {
 public:
     StateMachine(State initialState);
@@ -16,6 +20,8 @@ public:
     void setState(State state);
     State state();
 
+    void Home();
+    void Turn(std::string param);
     void Ready();
 private:
     struct Robot {

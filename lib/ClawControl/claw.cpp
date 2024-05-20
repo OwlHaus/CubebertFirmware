@@ -1,6 +1,12 @@
 #include "claw.h"
 
-Claw::Claw() {
+Claw::Claw(
+    uint fingerPin1,
+    uint fingerPin2,
+    uint stepPin,
+    uint directionPin,
+    uint sleepPin,
+    uint homingPin) {
 }
 
 Claw::~Claw() {
@@ -9,6 +15,13 @@ Claw::~Claw() {
 }
 
 void Claw::initialize() {
+    home();
+}
+
+void Claw::home() {
     m_palm->home();
     m_wrist->home();
+}
+
+void Claw::turn(int32_t deg) {
 }

@@ -4,6 +4,8 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 
+#include "claw.h"
+#include "config.h"
 #include "wrist.h"
 
 StateMachine::StateMachine(State initialState) {
@@ -72,9 +74,9 @@ void StateMachine::Home() {
 }
 
 void StateMachine::Turn(std::string param) {
-    char* ch = param.front();
+    char ch = param.front();
     param.erase(param.begin());
-    \
+
     Claw* claw;
     switch(ch) {
         case 'n':
@@ -102,12 +104,12 @@ void StateMachine::Ready() {
     Command* cmd = m_fipc->next();
 
     switch(cmd->action()) {
-    case Action::Home: home();
+    case Action::Home: Home();
         break;
-    case Action::Turn: turn(cmd->param());
+    case Action::Turn: Turn(cmd->param());
         break;
-    case Action::Clawffset: setClawffset(cmd->param);
-        break;
+    // case Action::Clawffset: setClawffset(cmd->param());
+    //     break;
     case Action::Solve:
         break;
     case Action::None:
