@@ -1,16 +1,27 @@
 #ifndef FINGERS_H
 #define FINGERS_H
 
+#include "hardware/irq.h"
+
 class Fingers {
 public:
-    Fingers();
+    Fingers(int pin);
     ~Fingers();
 
-private:
-    int m_set1Pin;
-    int m_set2Pin;
+    enum State {
+        Unknown,
+        Open,
+        Closed
+    };
 
-    int m_state;
+    void open();
+    void close();
+
+private:
+    int m_pin;
+    State m_state;
+
+    void set_pwm_pin(int pin, irq_handler_t callback);
 };
 
 #endif // FINGERS_H

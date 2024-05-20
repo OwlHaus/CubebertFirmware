@@ -1,0 +1,82 @@
+;
+; Copyright (c) 2023 Kevin Barnett, Dylan Hartfield
+;
+; SPDX-License-Identifier: MIT
+;
+
+; SET pin 0 should be mapped to your Stepper Output
+; X will hold our frequency
+
+.program stepper
+.wrap_target
+main:
+    pull block    ; Start with the number of steps
+    mov y, osr
+    jmp !y home   ; If we receive 0 perform the homing sequence
+
+    pull block    ; Then we'll get the frequency and hope it works like I want
+
+pulse:
+    set pins, 1 [2] ; Bring STEP HIGH, and wait 1 Cycle
+    set pins, 0 [2] ; Bring STEP LOW, and wait 1 Cycle
+
+waitx:            ; and delay x
+    jmp x-- waitx
+    mov x, osr    ; Reset x
+    jmp y-- pulse ; Repeat until y steps
+
+exit:
+    in x, 2
+    push noblock
+    jmp main
+
+;Extra Functions
+home:
+    pull block
+    mov y, osr ; Steps
+
+    pull block ; We'll grab x later, save 1 instruction
+
+pulse2:
+    set pins, 1 [2]  ; Bring STEP HIGH, and wait 1 Cycle
+    set pins, 0 [2]  ; Bring STEP LOW, and wait 1 Cycle
+
+waitx2:            ; and delay x
+    jmp x-- waitx2
+    mov x, osr    ; Reset x
+    jmp pin backup
+    jmp y-- pulse2 ; Repeat until y steps
+
+backup:
+    set x, 1
+    jmp exit
+.wrap
+
+% c-sdk {
+#include "hardware/clocks.h"
+
+/**
+ * @brief Initializes the Stepper PIO State Machine program
+ * 
+ * @param pio - pio block
+ * @param sm - pio state machine
+ * @param offset - state machine program offset
+ * @param stepPin - pin for steppering
+ * @param homingPin - pin for the homering
+ */
+static inline void stepper_program_init(PIO pio, uint sm, uint offset, uint stepPin, uint homingPin) {
+    pio_gpio_init(pio, stepPin);
+    pio_gpio_init(pio, homingPin);
+    
+    pio_sm_set_consecutive_pindirs(pio, sm, stepPin, 1, true);
+    pio_sm_config c = stepper_program_get_default_config(offset);
+    sm_config_set_out_pins(&c, stepPin, 1);
+    sm_config_set_jmp_pin(&c, homingPin);
+    sm_config_set_set_pins(&c, stepPin, 1);
+
+    float div = clock_get_hz(clk_sys) / 65535;
+    sm_config_set_clkdiv(&c, div);
+
+    pio_sm_init(pio, sm, offset, &c);
+}
+%}
