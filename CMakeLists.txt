@@ -1,33 +1,38 @@
-cmake_minimum_required(VERSION 3.17)
+# Generated Cmake Pico project file
 
-include(${PICO_SDK_PATH}/external/pico_sdk_import.cmake)
+cmake_minimum_required(VERSION 3.13)
 
-# set the project name
-project(
-  CubebertFirmware
-  LANGUAGES C CXX ASM
-  VERSION 0.0.1
-)
+set(CMAKE_C_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-pico_sdk_init()
+# Initialise pico_sdk from installed location
+# (note this can come from environment, CMake cache etc)
 
-# set compiler flags
-# -Ofast - optimises as much as reasonably possible
-set(CMAKE_CSTANDARD 11)
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
-
-if(EXISTS /home/pi)
-    set(IS_RPI true)
+# == DO NOT EDIT THE FOLLOWING LINES for the Raspberry Pi Pico VS Code Extension to work ==
+if(WIN32)
+    set(USERHOME $ENV{USERPROFILE})
+else()
+    set(USERHOME $ENV{HOME})
 endif()
+set(sdkVersion 2.1.0)
+set(toolchainVersion 13_3_Rel1)
+set(picotoolVersion 2.1.0)
+set(picoVscode ${USERHOME}/.pico-sdk/cmake/pico-vscode.cmake)
+if (EXISTS ${picoVscode})
+    include(${picoVscode})
+endif()
+# ====================================================================================
+set(PICO_BOARD pico_w CACHE STRING "Board type")
+
+# Pull in Raspberry Pi Pico SDK (must be before project)
+include(pico_sdk_import.cmake)
+
+project(CuberbertFirmwareRedux C CXX ASM)
+
+# Initialise the Raspberry Pi Pico SDK
+pico_sdk_init()
 
 add_subdirectory(bin)
 add_subdirectory(lib)
 
-# Setup packaging information
-include(InstallRequiredSystemLibraries)
-set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE")
-set(CPACK_PACKAGE_VERSION_MAJOR "${CubebertFirmware_VERSION_MAJOR}")
-set(CPACK_PACKAGE_VERSION_MINOR "${CubebertFirmware_VERSION_MINOR}")
-set(CPACK_SOURCE_GENERATOR "TGZ")
-include(CPack)

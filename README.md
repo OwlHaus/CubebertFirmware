@@ -7,23 +7,39 @@ Under construction, being rewritten for Micropython
 ## Getting Started
 
 ### Prerequisites
-- Raspberry Pi >= 3
-- RPi Pico SDK Installed // See [Pico SDK Getting Started](https://datasheets.raspberrypi.com/pico/getting-started-with-pico.pdf)
-- CMake >= 3.10
+- VSCode
+- VSCode Extension > Raspberry Pi Pico
+- CMake > 3.13
+
+### Recommended Extensions
+- C/C++ by Microsoft
+- C/C++ Extension Pack by Microsoft
+- C/C++ Themes by Microsoft
+- CMake Tools by Microsoft
 
 ### Building
+You have two options for building
+
+#### Extension Based
+- Click the `Raspberry Pi Pico Project` Extension in the toolbar
+- Select `Clean CMake`
+- Select `Configure CMake`
+- Boot RPi Pico into `BOOTSEL` Mode
+- Select `Run Project (USB)`
+
+#### Manual
 ```sh
+# Configure
 mkdir build
 cd build
+cmake ..
 
-# If using PIcoW add this parameter  -DPICO_BOARD=pico_w
-cmake .. -DPICO_SDK_PATH=$PICO_SDK_PATH
+# Build
 make
-```
 
-### Running
-Gotta load it on to the Pico, but I'll figure out how to do that later
+# Flash using picotool
+```
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details
+This project is licensed under the MIT [License](LICENSE)
