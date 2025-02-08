@@ -1,16 +1,16 @@
-#include "fipc.h"
+#include "uart.h"
 
 #include "pico/stdio.h"
 
-FIPC::FIPC() {
+UART::UART() {
     m_commandBuffer = new CommandBuffer();
 }
 
-FIPC::~FIPC() {
+UART::~UART() {
     delete m_commandBuffer;
 }
 
-Command* FIPC::next() {
+Command* UART::next() {
     processQueue();
 
     Command* cmd = m_commandBuffer->front();
@@ -27,7 +27,7 @@ Command* FIPC::next() {
 // PRIVATE FUNCTIONS //
 //*******************//
 
-void FIPC::processQueue() {
+void UART::processQueue() {
     std::string action = "";
     std::string buffer = "";
     

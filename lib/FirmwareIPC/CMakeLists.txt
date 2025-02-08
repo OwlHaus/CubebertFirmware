@@ -1,6 +1,11 @@
 set(LIB_NAME FirmwareIPC)
 
-add_library(${LIB_NAME} command.cpp fipc.cpp)
+add_library(
+  ${LIB_NAME}
+  command.cpp
+  i2c.cpp
+  uart.cpp
+)
 
 target_include_directories(
   ${LIB_NAME}

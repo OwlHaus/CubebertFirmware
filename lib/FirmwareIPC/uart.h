@@ -1,15 +1,15 @@
-#ifndef FIPC_H
-#define FIPC_H
+#ifndef UART_H
+#define UART_H
 
 #include <queue>
 #include "command.h"
 
 typedef std::queue<Command*> CommandBuffer;
 
-class FIPC {
+class UART {
 public:
-    FIPC();
-    ~FIPC();
+    UART();
+    ~UART();
 
     Command* next();
 
@@ -19,4 +19,4 @@ private:
     void processQueue();
 };
 
-#endif // FIPC_H
+#endif // UART_H
