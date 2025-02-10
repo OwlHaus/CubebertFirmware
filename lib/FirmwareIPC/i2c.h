@@ -1,14 +1,14 @@
 #ifndef I2C_H
 #define I2C_H
 
-#include <queue>
+#include <cstdint>
+
 #include "command.h"
+#include "fipc.h"
 
-typedef std::queue<Command*> CommandBuffer;
-
-class I2C {
+class I2C : public FIPC {
 public:
-    I2C();
+    I2C(uint8_t sda, uint8_t scl);
     ~I2C();
 
     Command* next();

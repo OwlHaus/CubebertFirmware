@@ -25,10 +25,12 @@ endif()
 # ====================================================================================
 set(PICO_BOARD pico_w CACHE STRING "Board type")
 
+add_definitions(-DCUBEBERT_FIPC_UART)
+
 # Pull in Raspberry Pi Pico SDK (must be before project)
 include(pico_sdk_import.cmake)
 
-project(CuberbertFirmwareRedux C CXX ASM)
+project(CubebertFirmware C CXX ASM)
 
 # Initialise the Raspberry Pi Pico SDK
 pico_sdk_init()

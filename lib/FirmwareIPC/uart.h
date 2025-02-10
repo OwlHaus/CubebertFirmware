@@ -1,20 +1,25 @@
 #ifndef UART_H
 #define UART_H
 
-#include <queue>
+#include <cstdint>
+
 #include "command.h"
+#include "fipc.h"
 
-typedef std::queue<Command*> CommandBuffer;
-
-class UART {
+class UART : public FIPC {
 public:
-    UART();
+    UART(uint8_t rx, uint8_t tx);
     ~UART();
 
     Command* next();
 
+    void puts(std::string str);   
+
 private:
     CommandBuffer* m_commandBuffer;
+
+    int m_rx;
+    int m_tx;
 
     void processQueue();
 };

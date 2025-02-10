@@ -12,17 +12,16 @@ target_include_directories(
   INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-pico_enable_stdio_usb(${LIB_NAME} 1)
-pico_enable_stdio_uart(${LIB_NAME} 0)
-
 target_link_libraries(
   ${LIB_NAME}
   pico_stdlib
+  hardware_i2c
 )
 
 add_dependencies(
   ${LIB_NAME}
   pico_stdlib
+  hardware_i2c
 )
 
 install(TARGETS ${LIB_NAME} DESTINATION lib)
