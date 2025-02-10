@@ -1,14 +1,13 @@
 #ifndef UART_H
 #define UART_H
 
-#include <cstdint>
-
 #include "command.h"
 #include "fipc.h"
+#include "pico/stdio.h"
 
 class UART : public FIPC {
 public:
-    UART(uint8_t rx, uint8_t tx);
+    UART(uint rx, uint tx);
     ~UART();
 
     Command* next();

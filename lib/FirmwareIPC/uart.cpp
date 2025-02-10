@@ -3,7 +3,7 @@
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 
-UART::UART(uint8_t rx, uint8_t tx) {
+UART::UART(uint rx, uint tx) {
     m_commandBuffer = new CommandBuffer();
 
     m_rx = rx;

@@ -4,7 +4,7 @@
 #include "pico/stdlib.h"
 #include "hardware/i2c.h"
 
-I2C::I2C(uint8_t sda, uint8_t scl) {
+I2C::I2C(uint sda, uint scl) {
     m_commandBuffer = new CommandBuffer();
 
     i2c_init(i2c0, 100000);
