@@ -7,10 +7,10 @@
 #include "pico/stdlib.h"
 
 Wrist::Wrist(
-    uint32_t stepPin,
-    uint32_t directionPin,
-    uint32_t sleepPin,
-    uint32_t homingPin) {
+    uint stepPin,
+    uint directionPin,
+    uint sleepPin,
+    uint homingPin) {
     // Save Pin Info
     m_stepPin = stepPin;
     m_directionPin = directionPin;
@@ -36,11 +36,11 @@ Wrist::~Wrist() {
     
 }
 
-void Wrist::blink(uint32_t howMany) {
+void Wrist::blink(uint interval) {
     const uint LED_PIN = 0;
     gpio_init(LED_PIN);
     gpio_set_dir(LED_PIN, GPIO_OUT);
-    for (int i=0; i<howMany; ++i) {
+    for (int i=0; i<interval; ++i) {
         gpio_put(LED_PIN, 1);
         sleep_ms(250);
         gpio_put(LED_PIN, 0);

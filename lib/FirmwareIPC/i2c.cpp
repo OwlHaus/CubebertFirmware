@@ -1,16 +1,31 @@
-#include "fipc.h"
+#include "i2c.h"
 
 #include "pico/stdio.h"
+#include "pico/stdlib.h"
+#include "hardware/i2c.h"
 
-FIPC::FIPC() {
+I2C::I2C(uint sda, uint scl) {
     m_commandBuffer = new CommandBuffer();
+
+    i2c_init(i2c0, 100000);
+    gpio_set_function(sda, GPIO_FUNC_I2C);
+    gpio_set_function(scl, GPIO_FUNC_I2C);
+
+    gpio_pull_up(sda);
+    gpio_pull_up(scl);
+    
+    i2c_set_slave_mode(i2c0, true, 0x42);
 }
 
-FIPC::~FIPC() {
+I2C::~I2C() {
     delete m_commandBuffer;
+
+    i2c_deinit(i2c0);
+    gpio_set_function(0, GPIO_FUNC_SIO);
+    gpio_set_function(1, GPIO_FUNC_SIO);
 }
 
-Command* FIPC::next() {
+Command* I2C::next() {
     processQueue();
 
     Command* cmd = m_commandBuffer->front();
@@ -27,13 +42,16 @@ Command* FIPC::next() {
 // PRIVATE FUNCTIONS //
 //*******************//
 
-void FIPC::processQueue() {
+void I2C::processQueue() {
     std::string action = "";
     std::string buffer = "";
     
     bool readingCmd = false;
-    for (int ch; (ch = getchar()); ch != EOF) {
-        char pChar = static_cast<char>(ch);
+    while (true) {
+        // This won't work, if there's no byte then it will read incorrectly
+        // Fix by blocking or checking bytes, hard to know exactly what the fix
+        // Is until I get the RPI to send data
+        char pChar = static_cast<char>(i2c_read_byte_raw(i2c0));
         
         if (pChar == '*') {
             break;

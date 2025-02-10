@@ -6,11 +6,18 @@
 
 #include "claw.h"
 #include "config.h"
+#include "i2c.h"
+#include "uart.h"
 #include "wrist.h"
 
 StateMachine::StateMachine(State initialState) {
     m_state = initialState;
-    m_fipc = new FIPC();
+    
+#ifdef CUBEBERT_FIPC_UART
+    m_fipc = new UART(0, 1);
+#else
+    m_fipc = new I2C(2, 3);
+#endif
 
     m_robot.north = new Claw(
         NORTH_FINGER1,
@@ -100,6 +107,14 @@ void StateMachine::Turn(std::string param) {
     claw->turn(std::stoi(param));
 }
 
+void StateMachine::Clawffset(std::string param) {
+    m_fipc->puts("Clawffset\n");
+}
+
+void StateMachine::Solve(std::string param) {
+    m_fipc->puts("Solving\n");
+}
+
 void StateMachine::Ready() {
     Command* cmd = m_fipc->next();
 
@@ -108,15 +123,36 @@ void StateMachine::Ready() {
         break;
     case Action::Turn: Turn(cmd->param());
         break;
-    // case Action::Clawffset: setClawffset(cmd->param());
-    //     break;
-    case Action::Solve:
+    case Action::Clawffset: Clawffset(cmd->param());
+        break;
+    case Action::Solve: Solve(cmd->param());
         break;
     case Action::None:
     default:
-        printf("No Command On Deck\n");
+        m_fipc->puts("No Command On Deck\n");
         break;
     }
 
     delete cmd;
+}
+
+//*******************//
+// PRIVATE FUNCTIONS //
+//*******************//
+
+// This is not correct, it should convert each L,R,W, etc to a motor turn
+std::queue<std::string> StateMachine::parseSolve(std::string solve) {
+    std::queue<std::string> q;
+    std::string buffer = "";
+
+    for (char ch : solve) {
+        if (ch == ',') {
+            q.push(buffer);
+            buffer.clear();
+        } else {
+            buffer.push_back(ch);
+        }
+    }
+
+    return q;
 }

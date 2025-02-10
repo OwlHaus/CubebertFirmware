@@ -22,7 +22,10 @@ public:
 
     void Home();
     void Turn(std::string param);
+    void Clawffset(std::string param);
+    void Solve(std::string param);
     void Ready();
+
 private:
     struct Robot {
         Claw *north;
@@ -35,6 +38,8 @@ private:
 
     State m_state;
     FIPC* m_fipc;
+
+    std::queue<std::string> parseSolve(std::string solve);
 };
 
 #endif // STATE_H

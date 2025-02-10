@@ -1,4 +1,4 @@
-set(BIN_NAME cubebert-firmware)
+set(BIN_NAME CubebertFirmware)
 
 add_executable(${BIN_NAME} cubebert-firmware.cpp state.cpp)
 
@@ -23,6 +23,7 @@ add_dependencies(
   pico_stdlib
 )
 
-install(TARGETS ${BIN_NAME} DESTINATION sbin)
-
 pico_add_extra_outputs(${BIN_NAME})
+
+# set output in build directory to top level instead of bin/
+set_target_properties(${BIN_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})

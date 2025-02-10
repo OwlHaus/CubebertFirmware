@@ -8,15 +8,12 @@ typedef std::queue<Command*> CommandBuffer;
 
 class FIPC {
 public:
-    FIPC();
-    ~FIPC();
+    virtual Command* next();
 
-    Command* next();
+    virtual void puts(std::string str);
 
 private:
-    CommandBuffer* m_commandBuffer;
-
-    void processQueue();
+    virtual void processQueue();
 };
 
 #endif // FIPC_H
