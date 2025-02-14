@@ -2,6 +2,7 @@
 #define STATE_H
 
 #include "fipc.h"
+#include "rcsp.h"
 
 enum State {
     Shutdown,
@@ -38,8 +39,7 @@ private:
 
     State m_state;
     FIPC* m_fipc;
-
-    std::queue<std::string> parseSolve(std::string solve);
+    RCSP* m_rcsp;
 };
 
 #endif // STATE_H

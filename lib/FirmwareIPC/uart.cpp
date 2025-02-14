@@ -1,5 +1,7 @@
 #include "uart.h"
 
+#include <format>
+
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
 
@@ -49,29 +51,22 @@ void UART::processQueue() {
     std::string buffer = "";
     
     puts("processQueue()\r\n");
-    bool readingCmd = false;
-    for (int ch; (ch = uart_getc(uart0)); ch != EOF) {
+    int ch;
+    do {
+        ch = uart_getc(uart0);
         char pChar = static_cast<char>(ch);
-        
-        if (pChar == '*') {
-            break;
-        }
 
         switch (pChar) {
-        case '^': readingCmd = true;
-            break;
         case ',': std::swap(action, buffer);
             break;
-        case '&':
+        case ';':
+            puts(std::format("Pushing: %s, %s\r\n", action.c_str(), buffer.c_str()));
             m_commandBuffer->push(new Command(action, buffer));
             action.clear();
             buffer.clear();
-            readingCmd = false;
             break;
         default:
-            if (readingCmd) {
-                buffer.push_back(pChar);
-            }
+            buffer.push_back(pChar);
         }
-    }
+    } while(ch != ';');
 }

@@ -18,6 +18,9 @@ StateMachine::StateMachine(State initialState) {
 #else
     m_fipc = new I2C(2, 3);
 #endif
+    m_fipc->puts("Initialize State Machine\n");
+
+    m_rcsp = new RCSP(m_fipc);
 
     m_robot.north = new Claw(
         NORTH_FINGER1,
@@ -104,7 +107,7 @@ void StateMachine::Turn(std::string param) {
             break;
     };
 
-    claw->turn(std::stoi(param));
+    //claw->turn(std::stoi(param));
 }
 
 void StateMachine::Clawffset(std::string param) {
@@ -113,9 +116,24 @@ void StateMachine::Clawffset(std::string param) {
 
 void StateMachine::Solve(std::string param) {
     m_fipc->puts("Solving\n");
+    
+    std::queue<std::string> moves;
+    while(param.length() != 0) {
+        moves.push(param.substr(0, param.find(' ')));
+        if (param.find(' ') == std::string::npos) {
+            break;
+        }
+        param = param.substr(param.find(' ') + 1);
+    }
+
+    std::queue<Move*> *moveQueue = m_rcsp->parseSolve(moves);
+    m_rcsp->printMoveQueue(moveQueue);
+
+    m_fipc->puts("Done Solving\n");
 }
 
 void StateMachine::Ready() {
+    m_fipc->puts("Ready\n");
     Command* cmd = m_fipc->next();
 
     switch(cmd->action()) {
@@ -134,25 +152,4 @@ void StateMachine::Ready() {
     }
 
     delete cmd;
-}
-
-//*******************//
-// PRIVATE FUNCTIONS //
-//*******************//
-
-// This is not correct, it should convert each L,R,W, etc to a motor turn
-std::queue<std::string> StateMachine::parseSolve(std::string solve) {
-    std::queue<std::string> q;
-    std::string buffer = "";
-
-    for (char ch : solve) {
-        if (ch == ',') {
-            q.push(buffer);
-            buffer.clear();
-        } else {
-            buffer.push_back(ch);
-        }
-    }
-
-    return q;
 }

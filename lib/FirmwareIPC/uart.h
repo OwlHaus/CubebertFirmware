@@ -12,7 +12,7 @@ public:
 
     Command* next();
 
-    void puts(std::string str);   
+    void puts(std::string str);
 
 private:
     CommandBuffer* m_commandBuffer;

@@ -11,9 +11,6 @@ public:
     virtual Command* next();
 
     virtual void puts(std::string str);
-
-private:
-    virtual void processQueue();
 };
 
 #endif // FIPC_H
