@@ -1,12 +1,12 @@
-#ifndef FINGERS_H
-#define FINGERS_H
+#ifndef GRIP_H
+#define GRIP_H
 
 #include "hardware/irq.h"
 
-class Fingers {
+class Grip {
 public:
-    Fingers(int pin);
-    ~Fingers();
+    Grip(int pin);
+    ~Grip();
 
     enum State {
         Unknown,
@@ -14,8 +14,11 @@ public:
         Closed
     };
 
+    void home();
     void open();
     void close();
+    void execute();
+    void waitForReady();
 
 private:
     int m_pin;
@@ -24,4 +27,4 @@ private:
     void set_pwm_pin(int pin, irq_handler_t callback);
 };
 
-#endif // FINGERS_H
+#endif // GRIP_H

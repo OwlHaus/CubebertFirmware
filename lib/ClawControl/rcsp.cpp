@@ -8,13 +8,13 @@ RCSP::RCSP(FIPC* fipc) {
 }
 
 // Function to calculate the rotation
-NewMove RCSP::calculateRotation(Move* previousMove, Grip grip, int multiplier) {
+NewMove RCSP::calculateRotation(Move* previousMove, GripDirection grip, int multiplier) {
     NewMove newMove{
         nullptr,
         true,
     };
-    MoveOrientation orientation = grip == Grip::East || grip == Grip::West ? MoveOrientation::Longitude : MoveOrientation::Latitude;
-    if (previousMove->moveOrientation == orientation && grip != Grip::NorthSouth && grip != Grip::EastWest) {
+    MoveOrientation orientation = grip == GripDirection::East || grip == GripDirection::West ? MoveOrientation::Longitude : MoveOrientation::Latitude;
+    if (previousMove->moveOrientation == orientation && grip != GripDirection::NorthSouth && grip != GripDirection::EastWest) {
         newMove.move = previousMove;
         newMove.pushMove = false;
     } else {
@@ -32,7 +32,7 @@ NewMove RCSP::calculateRotation(Move* previousMove, Grip grip, int multiplier) {
     }
 
     switch(grip) {
-        case Grip::North:
+        case GripDirection::North:
             newMove.move->northGripRotation += 90 * multiplier;
             if (newMove.move->northGripRotation == 270) {
                 newMove.move->northGripRotation = -90;
@@ -40,7 +40,7 @@ NewMove RCSP::calculateRotation(Move* previousMove, Grip grip, int multiplier) {
                 newMove.move->northGripRotation = 90;
             }
             break;
-        case Grip::South:
+        case GripDirection::South:
             newMove.move->southGripRotation += 90 * multiplier;
             if (newMove.move->southGripRotation == 270) {
                 newMove.move->southGripRotation = -90;
@@ -48,7 +48,7 @@ NewMove RCSP::calculateRotation(Move* previousMove, Grip grip, int multiplier) {
                 newMove.move->southGripRotation = 90;
             }
             break;
-        case Grip::East:
+        case GripDirection::East:
             newMove.move->eastGripRotation += 90 * multiplier;
             if (newMove.move->eastGripRotation == 270) {
                 newMove.move->eastGripRotation = -90;
@@ -56,7 +56,7 @@ NewMove RCSP::calculateRotation(Move* previousMove, Grip grip, int multiplier) {
                 newMove.move->eastGripRotation = 90;
             }
             break;
-        case Grip::West:
+        case GripDirection::West:
             newMove.move->westGripRotation += 90 * multiplier;
             if (newMove.move->westGripRotation == 270) {
                 newMove.move->westGripRotation = -90;
@@ -64,11 +64,11 @@ NewMove RCSP::calculateRotation(Move* previousMove, Grip grip, int multiplier) {
                 newMove.move->westGripRotation = 90;
             }
             break;
-        case Grip::NorthSouth:
+        case GripDirection::NorthSouth:
             newMove.move->eastGripRotation += 90 * multiplier;
             newMove.move->westGripRotation += -90 * multiplier;
             break;
-        case Grip::EastWest:
+        case GripDirection::EastWest:
             newMove.move->northGripRotation += 90 * multiplier;
             newMove.move->southGripRotation += -90 * multiplier;
             break;
@@ -78,13 +78,13 @@ NewMove RCSP::calculateRotation(Move* previousMove, Grip grip, int multiplier) {
 }
 
 // Function to calculate the grip state
-void RCSP::calculateGripState(Move *curMove, Move *previousMove, Grip grip) {
-    if (grip == Grip::NorthSouth) {
+void RCSP::calculateGripState(Move *curMove, Move *previousMove, GripDirection grip) {
+    if (grip == GripDirection::NorthSouth) {
         curMove->northGrip = GripState::AllOpen;
         curMove->southGrip = GripState::AllOpen;
         curMove->eastGrip = GripState::AllClosed;
         curMove->westGrip = GripState::AllClosed;
-    } else if (grip == Grip::EastWest) {
+    } else if (grip == GripDirection::EastWest) {
         curMove->northGrip = GripState::AllClosed;
         curMove->southGrip = GripState::AllClosed;
         curMove->eastGrip = GripState::AllOpen;
@@ -110,14 +110,14 @@ std::queue<Move*> *RCSP::parseMove(Move *previousMove, std::queue<std::string> s
 
     int multiplier = move.length() == 1 ? 1 : move[1] == '\'' ? -1 : 2;
 
-    Grip grip;
+    GripDirection grip;
     switch(move[0]) {
-        case 'R': grip = Grip::East; break;
-        case 'L': grip = Grip::West; break;
-        case 'F': grip = Grip::South; break;
-        case 'B': grip = Grip::North; break;
-        case 'X': grip = Grip::EastWest; break;
-        case 'Z': grip = Grip::NorthSouth; break;
+        case 'R': grip = GripDirection::East; break;
+        case 'L': grip = GripDirection::West; break;
+        case 'F': grip = GripDirection::South; break;
+        case 'B': grip = GripDirection::North; break;
+        case 'X': grip = GripDirection::EastWest; break;
+        case 'Z': grip = GripDirection::NorthSouth; break;
         default:
             printf("Invalid move: %s\n", move.c_str());
             return moves;
@@ -153,6 +153,16 @@ std::queue<Move*> *RCSP::parseSolve(std::queue<std::string> solve) {
 }
 
 void RCSP::printMoveQueue(std::queue<Move*> *queue) {
+    // Print the moves
+    while(!queue->empty()) {
+        Move *move = queue->front();
+        m_fipc->puts(moveToString(move));
+        queue->pop();
+        delete move;
+    }
+}
+
+std::string RCSP::moveToString(Move *move) {
     // lambda to turn gripstate into string
     auto gripStateToString = [](GripState gripState) {
         switch(gripState) {
@@ -168,11 +178,7 @@ void RCSP::printMoveQueue(std::queue<Move*> *queue) {
                 return "Unknown";
         }
     };
-
-    // Print the moves
-    while(!queue->empty()) {
-        Move *move = queue->front();
-        m_fipc->puts(std::format("Move:\r\n\
+    return std::format("Move:\r\n\
 \tnorthGrip: {} \r\n\
 \tsouthGrip: {} \r\n\
 \teastGrip: {} \r\n\
@@ -180,11 +186,9 @@ void RCSP::printMoveQueue(std::queue<Move*> *queue) {
 \tnorthGripRotation: {} \r\n\
 \tsouthGripRotaton: {} \r\n\
 \teastGripRotation: {} \r\n\
-\twestGripRotation: {} \r\n\r\n", gripStateToString(move->northGrip), gripStateToString(move->southGrip), gripStateToString(move->eastGrip), gripStateToString(move->westGrip), move->northGripRotation, move->southGripRotation, move->eastGripRotation, move->westGripRotation));
-        queue->pop();
-        delete move;
-    }
+\twestGripRotation: {} \r\n\r\n", gripStateToString(move->northGrip), gripStateToString(move->southGrip), gripStateToString(move->eastGrip), gripStateToString(move->westGrip), move->northGripRotation, move->southGripRotation, move->eastGripRotation, move->westGripRotation);
 }
+
 
 // int main() {
 //     RCSP rcsp;

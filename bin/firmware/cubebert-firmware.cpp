@@ -15,8 +15,6 @@ int main() {
     while(theMachine.state() != State::Shutdown) {
         switch(theMachine.state()){
         case State::Ready:
-            sleep_ms(10000);
-            //printf("State: Ready\n");
             theMachine.Ready();
             continue;
         default:

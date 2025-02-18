@@ -16,6 +16,9 @@ Wrist::Wrist(
     m_directionPin = directionPin;
     m_sleepPin = sleepPin;
     m_homingPin = homingPin;
+    m_angle = 0;
+    m_speed = 0;
+    m_enabled = false;
 
     // Initialize Pins
     m_pio = pio0;
@@ -29,23 +32,11 @@ Wrist::Wrist(
 
     gpio_init(m_sleepPin);
     gpio_set_dir(m_sleepPin, GPIO_OUT);
-    gpio_put(m_sleepPin, 1); // Start with the motor asleep
+    gpio_put(m_sleepPin, 0); // Start with the motor asleep
 }
 
 Wrist::~Wrist() {
     
-}
-
-void Wrist::blink(uint interval) {
-    const uint LED_PIN = 0;
-    gpio_init(LED_PIN);
-    gpio_set_dir(LED_PIN, GPIO_OUT);
-    for (int i=0; i<interval; ++i) {
-        gpio_put(LED_PIN, 1);
-        sleep_ms(250);
-        gpio_put(LED_PIN, 0);
-        sleep_ms(250);
-    }
 }
 
 void Wrist::home() {
@@ -73,14 +64,17 @@ void Wrist::home() {
  */
 void Wrist::turn(int32_t angle) {
     gpio_put(m_directionPin, (angle > 0 ? Direction::CW : Direction::CCW));
+    m_angle = angle;
+}
+
+void Wrist::execute() {
+    if (m_angle == 0) {
+        return;
+    }
 
     enable();
-
-    pio_sm_put(m_pio, m_stateMachine, angle2Steps(angle));
-    pio_sm_put(m_pio, m_stateMachine, 15);
-
-    pio_sm_get_blocking(m_pio, m_stateMachine);
-    blink(5);
+    pio_sm_put(m_pio, m_stateMachine, angle2Steps(m_angle));
+    pio_sm_put(m_pio, m_stateMachine, m_speed);
 }
 
 /**
@@ -102,18 +96,13 @@ void Wrist::setSpeed(float speed) {
 }
 
 /**
- * @brief Checks the Wrist is ready to perform another action
- * 
- * @return true - We all good
- * @return false - If there is no response from the SM or there is an error response
+ * @brief waits until the motor is ready to accept commands
  */
-bool Wrist::isReady() {
-    if (pio_sm_is_rx_fifo_empty(m_pio, m_stateMachine)) {
-        return false;
+void Wrist::waitForReady() {
+    if (m_enabled) {
+        pio_sm_get_blocking(m_pio, m_stateMachine);
+        disable();
     }
-
-    disable();
-    return true;
 }
 
 // ------ Private ------ //
@@ -125,6 +114,7 @@ uint32_t Wrist::pioBlockCounter = 0;
  * 
  */
 void Wrist::enable() {
+    m_enabled = true;
     gpio_put(m_sleepPin, 1);
     sleep_ms(25); // Wait for DRV8835 to wake up
 }
@@ -134,6 +124,7 @@ void Wrist::enable() {
  * 
  */
 void Wrist::disable() {
+    m_enabled = false;
     gpio_put(m_sleepPin, 0);
 }
 

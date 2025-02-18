@@ -60,7 +60,7 @@ void UART::processQueue() {
         case ',': std::swap(action, buffer);
             break;
         case ';':
-            puts(std::format("Pushing: %s, %s\r\n", action.c_str(), buffer.c_str()));
+            puts(std::format("Pushing: {} {}\r\n", action.c_str(), buffer.c_str()));
             m_commandBuffer->push(new Command(action, buffer));
             action.clear();
             buffer.clear();

@@ -1,5 +1,7 @@
 #include "state.h"
 
+#include <format>
+
 #include "command.h"
 #include "pico/stdio.h"
 #include "pico/stdlib.h"
@@ -89,33 +91,21 @@ void StateMachine::Turn(std::string param) {
 
     Claw* claw;
     switch(ch) {
-        case 'n':
-        case 'N':
-            claw = m_robot.north;
-            break;
-        case 'e':
-        case 'E':
-            claw = m_robot.east;
-            break;
-        case 's':
-        case 'S':
-            claw = m_robot.south;
-            break;
-        case 'w':
-        case 'W':
-            claw = m_robot.west;
-            break;
+        case 'N': claw = m_robot.north; break;
+        case 'E': claw = m_robot.east; break;
+        case 'S': claw = m_robot.south; break;
+        case 'W': claw = m_robot.west; break;
     };
 
-    //claw->turn(std::stoi(param));
+    claw->turn(std::stoi(param));
 }
 
 void StateMachine::Clawffset(std::string param) {
-    m_fipc->puts("Clawffset\n");
+    m_fipc->puts("Clawffset Not Implemented Yet\r\n");
 }
 
 void StateMachine::Solve(std::string param) {
-    m_fipc->puts("Solving\n");
+    m_fipc->puts("Solving\r\n");
     
     std::queue<std::string> moves;
     while(param.length() != 0) {
@@ -127,7 +117,72 @@ void StateMachine::Solve(std::string param) {
     }
 
     std::queue<Move*> *moveQueue = m_rcsp->parseSolve(moves);
-    m_rcsp->printMoveQueue(moveQueue);
+
+    Move *move = moveQueue->front();
+    moveQueue->pop();
+    while (move != nullptr) {
+        m_fipc->puts(m_rcsp->moveToString(move));
+
+        m_robot.east->grip(move->eastGrip);
+        m_robot.west->grip(move->westGrip);
+        m_robot.north->grip(move->northGrip);
+        m_robot.south->grip(move->southGrip);
+        m_fipc->puts("Gripping\r\n");
+
+        m_robot.north->executeVerticalGrip();
+        m_robot.south->executeVerticalGrip();
+        m_robot.east->executeVerticalGrip();
+        m_robot.west->executeVerticalGrip();
+        m_fipc->puts("Vertical Grip\r\n");
+
+
+        m_robot.north->waitForGripReady();
+        m_robot.south->waitForGripReady();
+        m_robot.east->waitForGripReady();
+        m_robot.west->waitForGripReady();
+        m_fipc->puts("Vertical Grip Ready\r\n");
+
+        m_robot.north->executeHorizontalGrip();
+        m_robot.south->executeHorizontalGrip();
+        m_robot.east->executeHorizontalGrip();
+        m_robot.west->executeHorizontalGrip();
+        m_fipc->puts("Horizontal Grip\r\n");
+        
+        m_robot.north->waitForGripReady();
+        m_robot.south->waitForGripReady();
+        m_robot.east->waitForGripReady();
+        m_robot.west->waitForGripReady();
+        m_fipc->puts("Horizontal Grip Ready\r\n");
+
+        m_robot.east->turn(move->eastGripRotation);
+        m_robot.west->turn(move->westGripRotation);
+        m_robot.north->turn(move->northGripRotation);
+        m_robot.south->turn(move->southGripRotation);
+        m_fipc->puts("Turning\r\n");
+
+        m_robot.east->executeTurn();
+        m_robot.west->executeTurn();
+        m_robot.north->executeTurn();
+        m_robot.south->executeTurn();
+        m_fipc->puts("Turned\r\n");
+
+        m_robot.east->waitForTurnReady();
+        m_fipc->puts("East Turned\r\n");
+        m_robot.west->waitForTurnReady();
+        m_fipc->puts("West Turned\r\n");
+        m_robot.north->waitForTurnReady();
+        m_fipc->puts("North Turned\r\n");
+        m_robot.south->waitForTurnReady();
+        m_fipc->puts("South Turned\r\n");
+
+        if(moveQueue->empty()) {
+            break;
+        }
+
+        delete move;
+        move = moveQueue->front();
+        moveQueue->pop();
+    }
 
     m_fipc->puts("Done Solving\n");
 }

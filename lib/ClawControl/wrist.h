@@ -19,6 +19,15 @@
 #define STEP_RESOLUTION      QUARTER_STEP
 #define STEPS_PER_REVOLUTION (360 / (DEG_PER_STEP * STEP_RESOLUTION))
 
+// no clue if this is correct, I have no clue what the state machine numbers actually are
+#define pis_smX_rx_fifo_not_empty(sm) ( \
+    (sm) == 0 ? pio_interrupt_source::pis_sm0_rx_fifo_not_empty : \
+    (sm) == 1 ? pio_interrupt_source::pis_sm1_rx_fifo_not_empty : \
+    (sm) == 2 ? pio_interrupt_source::pis_sm2_rx_fifo_not_empty : \
+    (sm) == 3 ? pio_interrupt_source::pis_sm3_rx_fifo_not_empty : \
+    -1) \
+)
+
 class Wrist {
 public:
     Wrist(
@@ -31,11 +40,10 @@ public:
     void home();
 
     void turn(int32_t deg);
+    void execute();
     void setSpeed(float speed); // (0.0, 1.0]
 
-    bool isReady();
-
-    void blink(uint interval);
+    void waitForReady();
 
 private:
     static uint32_t pioBlockCounter;
@@ -46,6 +54,8 @@ private:
     uint m_homingPin;
 
     uint32_t m_speed;
+    uint32_t m_angle;
+    bool m_enabled;
 
     PIO m_pio;
     uint32_t m_stateMachine;

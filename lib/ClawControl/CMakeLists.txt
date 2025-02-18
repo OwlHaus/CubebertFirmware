@@ -1,6 +1,6 @@
 set(LIB_NAME ClawControl)
 
-add_library(${LIB_NAME} claw.cpp fingers.cpp palm.cpp rcsp.cpp wrist.cpp)
+add_library(${LIB_NAME} claw.cpp grip.cpp rcsp.cpp wrist.cpp)
 
 pico_generate_pio_header(${LIB_NAME} ${CMAKE_CURRENT_LIST_DIR}/stepper.pio)
 

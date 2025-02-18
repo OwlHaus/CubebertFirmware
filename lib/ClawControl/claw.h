@@ -1,7 +1,7 @@
 #ifndef CLAW_H
 #define CLAW_H
 
-#include "palm.h"
+#include "grip.h"
 #include "wrist.h"
 
 struct WristConfig {
@@ -11,11 +11,20 @@ struct WristConfig {
     uint homingPin;
 };
 
+
+// Enum for grip state
+enum GripState {
+    VerticalClosed,
+    HorizontalClosed,
+    AllClosed,
+    AllOpen,
+};
+
 class Claw {
 public:
     Claw(
-        uint fingerPin1,
-        uint fingerPin2,
+        uint gripAPin,
+        uint gripBPin,
         uint stepPin,
         uint directionPin,
         uint sleepPin,
@@ -26,16 +35,24 @@ public:
     void initialize();
 
     void home();
-    void rotate(int32_t deg);
-    void grip();
-    void release();
-
     void turn(int32_t deg);
+    void grip(GripState gripState);
+    void executeVerticalGrip();
+    void executeHorizontalGrip();
+    void waitForGripReady();
+    void executeTurn();
+    void waitForTurnReady();
+
 private:
-    Palm* m_palm;
+    Grip* m_gripA;
+    Grip* m_gripB;
     Wrist* m_wrist;
 
-    int32_t m_angle;  
+    int32_t m_angle;
+    GripState m_gripState;
+
+    Grip* getVerticalGrip();
+    Grip* getHorizontalGrip();
 };
 
 #endif // CLAW_H

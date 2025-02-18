@@ -15,21 +15,13 @@ enum MoveOrientation {
 };
 
 // Enum for Grip
-enum Grip {
+enum GripDirection {
     North,
     South,
     East,
     West,
     NorthSouth,
     EastWest,
-};
-
-// Enum for grip state
-enum GripState {
-    VerticalClosed,
-    HorizontalClosed,
-    AllClosed,
-    AllOpen,
 };
 
 // Struct for storing the current move
@@ -57,14 +49,15 @@ public:
     RCSP(FIPC* fipc);
     std::queue<Move*> *parseSolve(std::queue<std::string> solve);
     void printMoveQueue(std::queue<Move*> *queue);
+    std::string moveToString(Move *move);
 
 private:
     Claw *m_claw;
     int32_t m_angle;
     FIPC* m_fipc;
 
-    NewMove calculateRotation(Move* previousMove, Grip grip, int multiplier);
-    void calculateGripState(Move *curMove, Move *previousMove, Grip grip);
+    NewMove calculateRotation(Move* previousMove, GripDirection grip, int multiplier);
+    void calculateGripState(Move *curMove, Move *previousMove, GripDirection grip);
     std::queue<Move*> *parseMove(Move *previousMove, std::queue<std::string> solve, std::queue<Move*> *moves);
 };
 
