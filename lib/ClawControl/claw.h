@@ -48,7 +48,6 @@ private:
     Grip* m_gripB;
     Wrist* m_wrist;
 
-    int32_t m_angle;
     GripState m_gripState;
 
     Grip* getVerticalGrip();

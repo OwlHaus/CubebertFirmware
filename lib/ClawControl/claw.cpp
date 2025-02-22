@@ -11,7 +11,6 @@ Claw::Claw(
     m_gripB = new Grip(gripBPin);
     m_wrist = new Wrist(stepPin, directionPin, sleepPin, homingPin);
     m_wrist->setSpeed(0.5);
-    m_angle = 0;
     m_gripState = GripState::AllOpen;
 }
 
@@ -81,7 +80,9 @@ void Claw::waitForTurnReady() {
 Grip* Claw::getVerticalGrip() {
     // if angle is between 315 and 45 or between 135 and 225 gripA is vertical
     // else gripB is vertical
-    if ((m_angle >= 315 && m_angle <= 360) || (m_angle >= 0 && m_angle <= 45) || (m_angle >= 135 && m_angle <= 225)) {
+    if ((m_wrist->getAngle() >= 315 && m_wrist->getAngle() <= 360)
+            || (m_wrist->getAngle() >= 0 && m_wrist->getAngle() <= 45)
+            || (m_wrist->getAngle() >= 135 && m_wrist->getAngle() <= 225)) {
         return m_gripA;
     } else {
         return m_gripB;
@@ -91,7 +92,8 @@ Grip* Claw::getVerticalGrip() {
 Grip* Claw::getHorizontalGrip() {
     // if angle is between 45 and 135 or between 225 and 315 gripA is horizontal
     // else gripB is horizontal
-    if ((m_angle >= 45 && m_angle <= 135) || (m_angle >= 225 && m_angle <= 315)) {
+    if ((m_wrist->getAngle() >= 45 && m_wrist->getAngle() <= 135)
+            || (m_wrist->getAngle() >= 225 && m_wrist->getAngle() <= 315)) {
         return m_gripA;
     } else {
         return m_gripB;

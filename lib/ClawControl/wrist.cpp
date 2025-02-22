@@ -55,6 +55,12 @@ void Wrist::home() {
 
     pio_sm_get_blocking(m_pio, m_stateMachine);
     disable();
+
+    m_angle = 0;
+}
+
+uint32_t Wrist::getAngle() {
+    return m_angle;
 }
 
 /**
