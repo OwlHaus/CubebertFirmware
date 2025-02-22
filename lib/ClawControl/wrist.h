@@ -30,12 +30,13 @@ public:
 
     void home();
 
+    uint32_t getAngle();
+
     void turn(int32_t deg);
+    void execute();
     void setSpeed(float speed); // (0.0, 1.0]
 
-    bool isReady();
-
-    void blink(uint interval);
+    void waitForReady();
 
 private:
     static uint32_t pioBlockCounter;
@@ -46,6 +47,9 @@ private:
     uint m_homingPin;
 
     uint32_t m_speed;
+    uint32_t m_turnAngle;
+    uint32_t m_angle;
+    bool m_enabled;
 
     PIO m_pio;
     uint32_t m_stateMachine;

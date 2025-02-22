@@ -26,7 +26,7 @@ waitx:            ; and delay x
     jmp y-- pulse ; Repeat until y steps
 
 exit:
-    in x, 2
+    in x, 31
     push noblock
     jmp main
 

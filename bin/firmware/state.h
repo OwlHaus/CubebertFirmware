@@ -2,6 +2,7 @@
 #define STATE_H
 
 #include "fipc.h"
+#include "grip.h"
 #include "rcsp.h"
 
 enum State {
@@ -25,6 +26,7 @@ public:
     void Turn(std::string param);
     void Clawffset(std::string param);
     void Solve(std::string param);
+    void Lift(std::string param);
     void Ready();
 
 private:
@@ -33,6 +35,7 @@ private:
         Claw *south;
         Claw *east;
         Claw *west;
+        Grip *lift;
     };
     
     Robot m_robot;

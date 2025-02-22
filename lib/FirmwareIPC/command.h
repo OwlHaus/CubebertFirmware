@@ -10,6 +10,7 @@ enum Action {
     Clawffset,
     Turn,
     Solve,
+    Lift,
 };
 
 class Command {
@@ -27,6 +28,7 @@ private:
         { "Clawffset", Action::Clawffset },
         { "Turn",      Action::Turn },
         { "Solve",     Action::Solve },
+        { "Lift",      Action::Lift },
     };
 
     Action m_action;
