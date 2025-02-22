@@ -47,6 +47,7 @@ private:
     uint m_homingPin;
 
     uint32_t m_speed;
+    uint32_t m_turnAngle;
     uint32_t m_angle;
     bool m_enabled;
 

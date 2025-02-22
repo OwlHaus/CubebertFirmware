@@ -16,6 +16,7 @@ Wrist::Wrist(
     m_directionPin = directionPin;
     m_sleepPin = sleepPin;
     m_homingPin = homingPin;
+    m_turnAngle = 0;
     m_angle = 0;
     m_speed = 0;
     m_enabled = false;
@@ -56,6 +57,7 @@ void Wrist::home() {
     pio_sm_get_blocking(m_pio, m_stateMachine);
     disable();
 
+    m_turnAngle = 0;
     m_angle = 0;
 }
 
@@ -70,16 +72,16 @@ uint32_t Wrist::getAngle() {
  */
 void Wrist::turn(int32_t angle) {
     gpio_put(m_directionPin, (angle > 0 ? Direction::CW : Direction::CCW));
-    m_angle = angle;
+    m_turnAngle = angle;
 }
 
 void Wrist::execute() {
-    if (m_angle == 0) {
+    if (m_turnAngle == 0) {
         return;
     }
 
     enable();
-    pio_sm_put(m_pio, m_stateMachine, angle2Steps(m_angle));
+    pio_sm_put(m_pio, m_stateMachine, angle2Steps(m_turnAngle));
     pio_sm_put(m_pio, m_stateMachine, m_speed);
 }
 
@@ -108,6 +110,13 @@ void Wrist::waitForReady() {
     if (m_enabled) {
         pio_sm_get_blocking(m_pio, m_stateMachine);
         disable();
+        m_angle += m_turnAngle;
+        if (m_angle >= 360) {
+            m_angle -= 360;
+        } else if (m_angle < 0) {
+            m_angle += 360;
+        }
+        m_turnAngle = 0;
     }
 }
 
