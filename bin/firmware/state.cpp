@@ -24,6 +24,8 @@ StateMachine::StateMachine(State initialState) {
 
     m_rcsp = new RCSP(m_fipc);
 
+    m_robot.lift = new Grip(LIFT_PIN);
+
     m_robot.north = new Claw(
         NORTH_FINGER1,
         NORTH_FINGER2,
@@ -187,6 +189,19 @@ void StateMachine::Solve(std::string param) {
     m_fipc->puts("Done Solving\n");
 }
 
+void StateMachine::Lift(std::string param) {
+    m_fipc->puts("StateMachine::Lift()\r\n");
+    switch(param.front()) {
+        case 'U': m_robot.lift->open(); break;
+        case 'D': m_robot.lift->close(); break;
+        default:
+            m_fipc->puts("Lift Not Implemented Yet\r\n");
+            break;
+    };
+    m_robot.lift->execute();
+    m_robot.lift->waitForReady();
+}
+
 void StateMachine::Ready() {
     m_fipc->puts("Ready\n");
     Command* cmd = m_fipc->next();
@@ -199,6 +214,8 @@ void StateMachine::Ready() {
     case Action::Clawffset: Clawffset(cmd->param());
         break;
     case Action::Solve: Solve(cmd->param());
+        break;
+    case Action::Lift: Lift(cmd->param());
         break;
     case Action::None:
     default:

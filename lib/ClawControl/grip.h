@@ -2,6 +2,7 @@
 #define GRIP_H
 
 #include "hardware/irq.h"
+#include "Servo.h"
 
 class Grip {
 public:
@@ -9,9 +10,9 @@ public:
     ~Grip();
 
     enum State {
-        Unknown,
-        Open,
-        Closed
+        Unknown = 0,
+        Open = 180,
+        Closed = 0,
     };
 
     void home();
@@ -23,8 +24,7 @@ public:
 private:
     int m_pin;
     State m_state;
-
-    void set_pwm_pin(int pin, irq_handler_t callback);
+    Servo *m_servo;
 };
 
 #endif // GRIP_H
